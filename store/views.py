@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render,get_object_or_404
+from accounts.models import UserProfile
 from carts.views import _cart_id
 from category.models import Category
 from carts.models import CartItem
 from orders.models import OrderProduct
 from store.forms import ReviewForm
-from .models import Product, ReviewRating
+from .models import Product, ProductGallery, ReviewRating
 from django.http import HttpResponse
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
@@ -63,12 +64,20 @@ def product_detail(request, category_slug, product_slug):
 
      # Get the reviews
     reviews = ReviewRating.objects.filter(product_id=single_product.id, status=True)
-
+    
+    #Show Customer Reviews Photo
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    
+    # Get the product gallery
+    product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
+    
     context={
         'single_product': single_product,
         'in_cart': in_cart,
         'orderproduct': orderproduct,
         'reviews': reviews,
+        'userprofile': userprofile,   
+        'product_gallery': product_gallery,     
     }
     return render(request, 'store/product_detail.html', context)
 
